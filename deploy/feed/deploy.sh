@@ -95,8 +95,9 @@ cmd_status() {
   url="$(g run services describe "$SERVICE" --region="$REGION" --format='value(status.url)')"
   echo "service $SERVICE: $url"
   g storage buckets describe "gs://$BUCKET" --format='yaml(name,location,uniform_bucket_level_access,public_access_prevention,cors_config)'
-  printf 'healthz: '
-  curl -fsS "$url/healthz" && echo
+  # Cloud Run's front end reserves /healthz, so check the feed itself.
+  printf 'feed: '
+  curl -fsS "$url/v1/feed?limit=1" && echo
 }
 
 case "${1:-}" in
